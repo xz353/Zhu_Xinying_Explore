@@ -1,0 +1,63 @@
+---
+title: "Zhu_Xinying hw#7"
+author: "Zhu_Xinying_R"
+date: "2016/10/27"
+output: html_document
+---
+
+explore <-function (df,ps,th,ov){
+  #df -- data frame
+  #ps -- plot switch
+  #th -- threshold
+  #nb --option vector
+  
+  x=list() 
+#initialize the return list
+  for (i in names(df)){
+#loop over all columns
+    if (is.numeric(df[[i]])){
+#a numeric column
+      x[[length(x)+1]] <-summary(df[[i]])
+#get summary statistics table
+      } else {
+#categorical or logical column
+        x[[length(x)+1]] <- table(df[[i]])
+#get frequency table
+    }
+  }
+  pairs <-c();
+#contains pair of column names
+  cors <-c();
+#contains correlation coefficients
+  nms <-names(df) 
+#get names of columns
+  for (i in c(1:(length(nms)-1))){
+    ni <-nms[[i]]
+#name of i-th column
+    if (is.numeric(df[[ni]])){
+      for (j in c((i+1):length(nms))){
+        nj <-nms[[j]]
+#name of j-th column
+        if (is.numeric(df[[nj]])){
+          cij <-cor(df[[ni]],df[[nj]])
+#compute correlation coefficient
+          if (abs(cij)> th)
+#compare cij with the correlation threshold
+          {
+            pairs[[length(pairs)+1]] <- paste(ni, nj, sep='-')
+#save column names
+            cors[[length(cors)+1]] <-cij
+#save cij
+          }
+        }
+      }
+    }
+  }
+  cp <-data.frame(pairs,cors)
+#form dataframe
+  colnames(cp) <-c('Variable Pairs', 'Pearson Exceeds Threshold')
+#change column names
+  x[[length(x)+1]] <-cp 
+#add to list
+  return(x)
+}
