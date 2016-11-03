@@ -176,6 +176,99 @@ $(document).ready(function () {
   x[[length(x)+1]] &lt;-cp 
 #add to list
   return(x)
+}
+
+#3
+multiplot &lt;-function(..., plotlist=NULL, file, cols=1,layout=NULL){
+  plots &lt;-c(list(...),plotlist)
+  numPlots = length(plots)
+  if (is.null(layout)){
+    layout &lt;-matrix(seq(1, cols*ceiling(numPlots/cols)),
+                    ncol=cols,nrow=ceiling(numPlots/cols))
+  }
+  if(numPlots==1){
+    print(plots[[1]])
+  }else{
+    grid.newpage()
+    pushViewport(viewport(layout=grid.layout(nrow(layout),ncol(layout))))
+    for(i in 1:numPlots){
+      matchidx&lt;-as.data.frame(which(layout==i,arr.ind=TRUE))
+      print(plots[[i]],vp=viewport(layout.pos.row=matchidx$row,
+                                   layout.pos.col=matchidx$col))
+    }
+  }
+}
+
+plot_density_count&lt;-function(data,plotswitch='off',vector=NULL){
+  num=data[sapply(data,is.numeric)]
+  if(plotswitch==&quot;on&quot;){
+    if(!is.null(vector)){
+      for(j in 1:length(vector)){
+        for(i in 1:ncol(num)){
+          mean&lt;-mean(num[,i])
+          p1&lt;-ggplot(num,aes(x=num[i]),color=&quot;blue&quot;)+
+            geom_histogram(fill=&quot;blue&quot;,bins=vector[j])+
+            ggtitle(paste(colnames(num[i]),vector[j],sep=&quot;bins=&quot;))+
+            xlab(colnames(num[i]))+
+            geom_vline(xintercept=mean,col=&quot;red&quot;)
+          
+          p2&lt;-ggplot(num,aes(x=num[i],..desity..))+
+            geom_histogram(fill=&quot;blue&quot;,bins=vector[j])+
+            ggtitle(paste(colnames(num[i]),vector[j],sep=&quot;bins=&quot;))+
+            xlab(colnames(num[i]))+
+            geom_vline(xintercept=mean,col=&quot;red&quot;)
+          
+          grid.newpage()
+          pushViewport(viewport(layout=grid.layout(2,2,heights=unit(c(1,8),&quot;null&quot;))))
+          title&lt;-paste(colnames(num[i]),vector[j],sep=&quot;bin=&quot;)
+          grid.text(title,vp=viewport(layout.pos.row=1,layout.pos.col=1:2))
+          print(p1,vp=viewport(layout.pos.row=2,layout.pos.col=1))
+          print(p2,vp=viewport(layout.pos.row=2,layout.pos.col=2))
+        }
+      }
+    }else{
+      for(i in 1:ncol(num)){
+        mean&lt;-mean(num[,i])
+        p1&lt;-ggplot(num,aes(x=num[i]),color=&quot;blue&quot;)+
+          geom_histogram(fill=&quot;blue&quot;)+
+          ggtitle(paste(colnames(num[i]),&quot;default bins&quot;, sep=&quot;bins=&quot;))+
+          xlab(colnames(num[i]))+
+          geom_vline(xintercept=mean,col=&quot;red&quot;)
+        p2&lt;-ggplot(num,aes(x=num[i],..density..))+
+          geom_histogram(fill=&quot;blue&quot;)+
+          ggtitle(paste(colnames(num[i]),&quot;default bins&quot;,sep=&quot;bins=&quot;))+
+          xlab(colnames(num[i]))+
+          geom_vline(xinterceot=mean,col=&quot;red&quot;)
+        grid.newpage()
+        pushViewport(viewport(layout = grid.layout(2, 2, heights = unit(c(1, 8), &quot;null&quot;))))
+        title &lt;- paste(colnames(num[i]),&quot;default bins&quot;,sep=&quot; bins=&quot;)
+        grid.text(title, vp = viewport(layout.pos.row = 1, layout.pos.col = 1:2))
+        print(p1, vp = viewport(layout.pos.row = 2, layout.pos.col = 1))
+        print(p2, vp = viewport(layout.pos.row = 2, layout.pos.col = 2))
+      }
+    }
+  }else{
+    if(plotswitch==&quot;grid&quot;){
+      for(j in 1:length(vector)){
+        grid.newpage()
+        his_count&lt;-list()
+        his_density&lt;-list()
+        for(i in 1:ncol(num)){
+          his_count[[i]]&lt;-ggplot(num,aes_string(colnames(num[i])),color=&quot;blue&quot;)+
+            geom_histogram(fill=&quot;blue&quot;, bins = vector[j])+ 
+            labs(title= paste(vector[j], &quot;bins&quot;)) 
+        }
+        multiplot(plotlist = his_count, cols = 2) 
+        for(i in 1:ncol(num)){
+          his_density[[i]] &lt;- ggplot(num, aes_string(colnames(num[i])), color = &quot;blue&quot;) + 
+            geom_histogram(aes(y= ..density..), fill=&quot;blue&quot;, bins = vector[j])+ 
+            labs(title= paste(vector[j], &quot;bins&quot;)) 
+          
+        }
+        multiplot(plotlist = his_density, cols = 2)
+      }
+    }
+  }
 }</code></pre>
 
 
