@@ -5,6 +5,8 @@ date: "2016/10/27"
 output: html_document
 ---
 
+##Comments: It is alway good to include one test case of your function to see how your function works and the arguments design. After the study of your code, the "th" is not set as a default argument. I think you need further effort for this function design. 
+
 ```{r}
 explore <- function (df, ps, th, ov){
     # df -- data frame
